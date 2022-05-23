@@ -99,6 +99,8 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //查詢店家
+        $company = Company::find($id);
         //驗證
         $data = $request->validate([
             'name'=>'required|min:2|max:20|unique:companies,name,' . $company->id ,
@@ -110,8 +112,6 @@ class CompanyController extends Controller
             'name.unique' => '商家名稱重複!',
             'status.boolean' => '只能為開啟或隱藏!'
         ]);
-        //查詢店家
-        $company = Company::find($id);
         //進行修改
         $company->update($data);
         //回傳

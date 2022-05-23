@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Content;
 use App\Models\Company;
+use DB;
 
 class ContentController extends Controller
 {
@@ -15,20 +16,34 @@ class ContentController extends Controller
      */
     public function index(Request $request)
     {
-        //當request等於null時
-        if($request->year == null && $request->month == null)
-            $contents = Content::select('contents.*','companies.name')->join('companies','contents.company_id','=','companies.id')->orderBy('up_at','asc')->get();
-        //當月份等於0時,代表全部月份
-        elseif($request->month == 0)
-            $contents = Content::select('contents.*','companies.name')->join('companies','contents.company_id','=','companies.id')->orderBy('up_at','asc')->get();
-        else
-            $contents = Content::select('contents.*','companies.name')->join('companies','contents.company_id','=','companies.id')
-                                                                    ->whereMonth('up_at',$request->month)
-                                                                    ->whereYear('up_at', $request->year)
-                                                                    ->orderBy('up_at','asc')
-                                                                    ->get();
-        
-        return view('contents.list', ['contents'=> $contents]);
+        //剛進網頁時
+        $request->year = ($request->year == null) ? 0 : $request->year;
+        $request->month = ($request->month == null) ? 0 : $request->month;
+        $request->company_id = ($request->company_id == null) ? 0 : $request->company_id;
+
+        $contents = Content::select('contents.*','companies.name')->join('companies','contents.company_id','=','companies.id');
+        $total = DB::table('contents');
+        if($request->year != 0){
+            $contents = $contents->whereYear('up_at', $request->year);
+            $total = $total->whereYear('up_at', $request->year);
+        }
+        if($request->month != 0){
+            $contents = $contents->whereMonth('up_at',$request->month);
+            $total = $total->whereMonth('up_at',$request->month);
+        } 
+        if($request->company_id != 0){
+            $contents = $contents->where('company_id', "=" ,$request->company_id);
+            $total = $total->where('company_id', "=" ,$request->company_id);
+        }
+            
+        $contents = $contents ->orderBy('up_at','asc')->get();
+        $total = $total->whereNull('deleted_at')->sum('amount');
+                                                                  
+        //查詢所有店家
+        $companys = Company::select('id','name')->get();
+        //總和值
+        return view('contents.list', ['contents'=> $contents,'companys'=> $companys, 'rebackyear' => $request->year,
+                                    'rebackmonth' => $request->month, 'rebackcompany_id' => $request->company_id, 'total' => $total]);
     }
 
     /**
@@ -38,6 +53,7 @@ class ContentController extends Controller
      */
     public function create()
     {
+        //查詢所有開啟的店家
         $companys = Company::select('id','name')->where('status', '=' , 1)->get();
         return view('contents.create', ['companys'=> $companys]);
     }
