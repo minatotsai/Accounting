@@ -1,9 +1,9 @@
-@extends('layouts/left')
+@extends('layouts/top')
 
-@section('right')
+@section('bottom')
 
 <div class="top">
-    <a href="{{route('companys.create')}}">新增店家</a>
+    <a href="{{route('companys.create')}}" class="btn btn-primary">新增店家</a>
     @if(session()->has('success'))
     <div class="alert alert-success" role="alert">
         {{session()->get('success')}}

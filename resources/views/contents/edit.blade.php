@@ -1,6 +1,6 @@
-@extends('layouts/left')
+@extends('layouts/top')
 
-@section('right')
+@section('bottom')
 
 <form action="{{route('contents.update',$content)}}" method="post">
 @csrf

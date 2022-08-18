@@ -1,6 +1,6 @@
-@extends('layouts/left')
+@extends('layouts/top')
 
-@section('right')
+@section('bottom')
 
 <div class="top">    
     <a href="{{route('contents.create')}}" class="btn btn-primary">新增訂單</a>   

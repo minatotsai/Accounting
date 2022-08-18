@@ -25,5 +25,4 @@ Route::get('/login', function () {
 Route::post('login', [LoginController::class,'check'])->name('check');
 Route::resource('companys', CompanyController::class);
 Route::resource('contents', ContentController::class);
-// Route::get('')
 Route::view('/left', 'layouts.left')->name('left');
