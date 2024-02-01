@@ -5,35 +5,37 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Content;
 use App\Models\Company;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
         //剛進網頁時
-        $request->year = ($request->year == null) ? 0 : $request->year;
-        $request->month = ($request->month == null) ? 0 : $request->month;
-        $request->company_id = ($request->company_id == null) ? 0 : $request->company_id;
+        $content = new Content();
+        $year = ($request->year == null) ? 0 : $request->year;
+        $month = ($request->month == null) ? 0 : $request->month;
+        $content->company_id = ($request->company_id == null) ? 0 : $request->company_id;
 
         $contents = Content::select('contents.*','companies.name')->join('companies','contents.company_id','=','companies.id');
         $total = DB::table('contents');
-        if($request->year != 0){
-            $contents = $contents->whereYear('up_at', $request->year);
-            $total = $total->whereYear('up_at', $request->year);
+        if($year != 0){
+            $contents = $contents->whereYear('up_at', $year);
+            $total = $total->whereYear('up_at', $year);
         }
-        if($request->month != 0){
-            $contents = $contents->whereMonth('up_at',$request->month);
-            $total = $total->whereMonth('up_at',$request->month);
+        if($month != 0){
+            $contents = $contents->whereMonth('up_at',$month);
+            $total = $total->whereMonth('up_at',$month);
         } 
-        if($request->company_id != 0){
-            $contents = $contents->where('company_id', "=" ,$request->company_id);
-            $total = $total->where('company_id', "=" ,$request->company_id);
+        if($content->company_id != 0){
+            $contents = $contents->where('company_id', "=" ,$content->company_id);
+            $total = $total->where('company_id', "=" ,$content->company_id);
         }
             
         $contents = $contents ->orderBy('up_at','asc')->get();
@@ -42,8 +44,8 @@ class ContentController extends Controller
         //查詢所有店家
         $companys = Company::select('id','name')->get();
         //總和值
-        return view('contents.list', ['contents'=> $contents,'companys'=> $companys, 'rebackyear' => $request->year,
-                                    'rebackmonth' => $request->month, 'rebackcompany_id' => $request->company_id, 'total' => $total]);
+        return view('contents.list', ['contents'=> $contents,'companys'=> $companys, 'rebackyear' => $year,
+                                    'rebackmonth' => $month, 'rebackcompany_id' => $content->company_id, 'total' => $total]);
     }
 
     /**
@@ -178,5 +180,62 @@ class ContentController extends Controller
        $content=Content::find($id);
        $content->delete();
        return redirect()->route('contents.index')->with('success','訂單編號: ' . $content->id .' 已被刪除!');
+    }
+
+    /**
+     * vue 
+     * add content
+     */
+    public function add_content( Request $request ){
+        // $contentData = new Content();
+        // $contentData->up_at = $request->input('date');
+        // $contentData->memo = $request->input('terms_and_conditions');
+        // $contentData->company_id = $request->input('company_id');
+        $contentItem = $request->input('items');
+
+        $contentData['up_at'] = $request->input('date');
+        $contentData['memo'] = $request->input('terms_and_conditions');
+        $contentData['company_id'] = $request->input('company_id');
+        date_default_timezone_set('Asia/Taipei');
+        $contentData['created_at'] = date("Y-m-d h:i:s");
+        $contentData['updated_at'] = date("Y-m-d h:i:s");
+
+        //$content = Content::create($contentData);
+
+
+        foreach(json_decode($contentItem) as $item){
+            // $contentData->price = $item->p_price;
+            // $contentData->content = $item->id;
+            // $contentData->quantity = $item->quantity;
+            // $contentData->amount = $this->amount($contentData->price, $contentData->quantity);
+            // $contentData;
+            // Content::create($contentData);
+            $contentData['price'] = $item->p_price;
+            $contentData['content'] = $item->id;
+            $contentData['quantity'] = $item->quantity;
+            $contentData['amount'] = $this->amount($item->p_price, $item->quantity);
+            $query= Content::create($contentData);
+            // $query = 0;
+            //print_r($contentData);
+            if($query){
+                return response()->json([
+                    'data' => 'success'
+                ],200);
+            }else{
+                return response()->json([
+                    'message' => 'fail'
+                ],422);
+            }
+        }
+
+    }
+
+    function amount( int $price, float $quantity){
+        return $price * $quantity;
+    }
+
+    public function delete_order($id){
+        $contentItem = Content::findOrFail($id);
+        $contentItem->delete();
     }
 }

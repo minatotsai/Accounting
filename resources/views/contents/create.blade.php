@@ -13,19 +13,21 @@
         @endforeach
     </select>
 </div>
-<div class="input-group mb-3">
+<div class="input-group mb-4">
     <span class="input-group-text">數量</span>
     <input type="number" id="quantity" name="quantity" step=".1" class="form-control" aria-label="數量" maxlength="5" onkeydown="javascript: return event.keyCode == 69 ? false : true"  value="{{old('quantity')}}">
     <span class="input-group-text">價格/斤</span>
     <input type="number" id="price" name="price" step=".1" class="form-control" aria-label="價格/斤" maxlength="5" onkeydown="javascript: return event.keyCode == 69 ? false : true"  value="{{old('price')}}">
     <span class="input-group-text">總價</span>
     <input type="number" id="amount" name="amount" class="form-control" aria-label="總價" value="{{old('amount')}}">
-</div>
-<div class="input-group mb-3">
     <span class="input-group-text">內容</span>
     <input type="text" name="content" class="form-control" aria-label="內容"  value="{{old('content')}}">
     <span class="input-group-text">備註</span>
     <input type="text" name="memo" class="form-control" aria-label="備註" value="{{old('memo')}}">
+    <a class="btn add" onclick="alertThis();"><i class="bi bi-plus-lg"></i></a>
+</div>
+<div class="input-group mb-3">
+    
 </div>
 <div class="row">
     <div class="col-auto">

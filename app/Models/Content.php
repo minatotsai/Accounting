@@ -5,16 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Content extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    public function company() {
-        return $this->belongsTo('App\Models\Company');
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'content', 'id');
+    }
     protected $fillable = [
         'content',
         'amount',
@@ -24,4 +30,9 @@ class Content extends Model
         'quantity',
         'up_at',
     ];
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 }

@@ -15,9 +15,13 @@ use App\Http\Controllers\ContentController;
 |
 */
 
+/*
 Route::get('/', function () {
     return view('welcome');
 });
+*/
+
+
 
 Route::get('/login', function () {
     return view('login');
@@ -26,3 +30,17 @@ Route::post('login', [LoginController::class,'check'])->name('check');
 Route::resource('companys', CompanyController::class);
 Route::resource('contents', ContentController::class);
 Route::view('/left', 'layouts.left')->name('left');
+
+//Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+//Auth::routes();
+
+Route::get('/', function() {
+    return view('welcome');
+});
+
+Route::get('/{pathMatch}', function(){
+    return view('welcome');
+})->where('pathMatch',".*");
