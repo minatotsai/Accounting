@@ -1,3 +1,3 @@
 自用記帳器
 
-使用 laravel8 + mysql 5.6 + bootstrap5來完成此專案。
+此專案有使用到 laravel9 + mysql 5.6 + vue3
